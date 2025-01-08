@@ -1,138 +1,161 @@
-import type { MetaFunction } from "@remix-run/node";
+import { useSpring, animated } from '@react-spring/web';
+import { Heart, Database, Send, Image } from "react-feather";
+import SimpleSlider from "../components/SimpleSlider";
+import FAQItem from "../components/FAQ";
+import { useLoaderData } from "@remix-run/react";
+import Layout from '../components/Layout';
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
-
-export default function Index() {
-  return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-16">
-        <header className="flex flex-col items-center gap-9">
-          <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
-            Welcome to <span className="sr-only">Remix</span>
-          </h1>
-          <div className="h-[144px] w-[434px]">
-            <img
-              src="/logo-light.png"
-              alt="Remix"
-              className="block w-full dark:hidden"
-            />
-            <img
-              src="/logo-dark.png"
-              alt="Remix"
-              className="hidden w-full dark:block"
-            />
-          </div>
-        </header>
-        <nav className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700">
-          <p className="leading-6 text-gray-700 dark:text-gray-200">
-            What&apos;s next?
-          </p>
-          <ul>
-            {resources.map(({ href, text, icon }) => (
-              <li key={href}>
-                <a
-                  className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500"
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {icon}
-                  {text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </div>
-  );
+// Loader para cargar los datos antes de que la página se renderice
+export function loader() {
+  return fetch("https://api.dorikyh.pw/bot/stats")
+    .then(response => response.json())
+    .then(data => ({
+      timesUsed: data.used_commands,
+      totalUsers: data.users,
+      totalSent: data.sent_media,
+    }))
+    .catch(error => {
+      console.error("Error fetching stats:", error);
+      return { timesUsed: 0, totalUsers: 0, totalSent: 0 };
+    });
 }
 
-const resources = [
-  {
-    href: "https://remix.run/start/quickstart",
-    text: "Quick Start (5 min)",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M8.51851 12.0741L7.92592 18L15.6296 9.7037L11.4815 7.33333L12.0741 2L4.37036 10.2963L8.51851 12.0741Z"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "https://remix.run/start/tutorial",
-    text: "Tutorial (30 min)",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M4.561 12.749L3.15503 14.1549M3.00811 8.99944H1.01978M3.15503 3.84489L4.561 5.2508M8.3107 1.70923L8.3107 3.69749M13.4655 3.84489L12.0595 5.2508M18.1868 17.0974L16.635 18.6491C16.4636 18.8205 16.1858 18.8205 16.0144 18.6491L13.568 16.2028C13.383 16.0178 13.0784 16.0347 12.915 16.239L11.2697 18.2956C11.047 18.5739 10.6029 18.4847 10.505 18.142L7.85215 8.85711C7.75756 8.52603 8.06365 8.21994 8.39472 8.31453L17.6796 10.9673C18.0223 11.0653 18.1115 11.5094 17.8332 11.7321L15.7766 13.3773C15.5723 13.5408 15.5554 13.8454 15.7404 14.0304L18.1868 16.4767C18.3582 16.6481 18.3582 16.926 18.1868 17.0974Z"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "https://remix.run/docs",
-    text: "Remix Docs",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M9.99981 10.0751V9.99992M17.4688 17.4688C15.889 19.0485 11.2645 16.9853 7.13958 12.8604C3.01467 8.73546 0.951405 4.11091 2.53116 2.53116C4.11091 0.951405 8.73546 3.01467 12.8604 7.13958C16.9853 11.2645 19.0485 15.889 17.4688 17.4688ZM2.53132 17.4688C0.951566 15.8891 3.01483 11.2645 7.13974 7.13963C11.2647 3.01471 15.8892 0.951453 17.469 2.53121C19.0487 4.11096 16.9854 8.73551 12.8605 12.8604C8.73562 16.9853 4.11107 19.0486 2.53132 17.4688Z"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "https://rmx.as/discord",
-    text: "Join Discord",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 24 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M15.0686 1.25995L14.5477 1.17423L14.2913 1.63578C14.1754 1.84439 14.0545 2.08275 13.9422 2.31963C12.6461 2.16488 11.3406 2.16505 10.0445 2.32014C9.92822 2.08178 9.80478 1.84975 9.67412 1.62413L9.41449 1.17584L8.90333 1.25995C7.33547 1.51794 5.80717 1.99419 4.37748 2.66939L4.19 2.75793L4.07461 2.93019C1.23864 7.16437 0.46302 11.3053 0.838165 15.3924L0.868838 15.7266L1.13844 15.9264C2.81818 17.1714 4.68053 18.1233 6.68582 18.719L7.18892 18.8684L7.50166 18.4469C7.96179 17.8268 8.36504 17.1824 8.709 16.4944L8.71099 16.4904C10.8645 17.0471 13.128 17.0485 15.2821 16.4947C15.6261 17.1826 16.0293 17.8269 16.4892 18.4469L16.805 18.8725L17.3116 18.717C19.3056 18.105 21.1876 17.1751 22.8559 15.9238L23.1224 15.724L23.1528 15.3923C23.5873 10.6524 22.3579 6.53306 19.8947 2.90714L19.7759 2.73227L19.5833 2.64518C18.1437 1.99439 16.6386 1.51826 15.0686 1.25995ZM16.6074 10.7755L16.6074 10.7756C16.5934 11.6409 16.0212 12.1444 15.4783 12.1444C14.9297 12.1444 14.3493 11.6173 14.3493 10.7877C14.3493 9.94885 14.9378 9.41192 15.4783 9.41192C16.0471 9.41192 16.6209 9.93851 16.6074 10.7755ZM8.49373 12.1444C7.94513 12.1444 7.36471 11.6173 7.36471 10.7877C7.36471 9.94885 7.95323 9.41192 8.49373 9.41192C9.06038 9.41192 9.63892 9.93712 9.6417 10.7815C9.62517 11.6239 9.05462 12.1444 8.49373 12.1444Z"
-          strokeWidth="1.5"
-        />
-      </svg>
-    ),
-  },
-];
+export default function Home() {
+  const stats = useLoaderData();  // Usamos los datos cargados por el loader
+
+  const animatedTimesUsed = useSpring({ number: stats.timesUsed, from: { number: 0 } });
+  const animatedTotalUsers = useSpring({ number: stats.totalUsers, from: { number: 0 } });
+  const animatedTotalSent = useSpring({ number: stats.totalSent, from: { number: 0 } });
+
+  const formatNumber = (number) => {
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1) + 'M';
+    }
+    return number.toLocaleString('en-US');
+  };
+
+  const faqs = [
+    {
+      question: "Aure is an inappropriate bot?",
+      answer: `Aure has a large number of different uses and among those are also NSFW functionalities, these functionalities can ONLY be used by users of legal age on 18+ channels, so you don't have to worry about your community being filled with inappropriate content.`,
+    },
+    {
+      question: "What are credits for and how can I obtain them?",
+      answer: `Credits are the global economy of Aure, with this you can have access to special features such as: generation of high resolution images or higher speed AutoPost channels.`,
+    },
+    {
+      question: "How do I disable AutoPost?",
+      answer: `To disable the constant and automatic sending of multimedia on a specific channel, you can go to the channel in question and use the /remove-autopost command. If you do not specify the channel, the channel where you executed the command will be selected.`,
+    },
+  ];
+
+  return (
+    <Layout>
+      <div className="dark:bg-gray-900 text-gray-900">
+        <section className="dark:text-white" id="about">
+          <div className="lg:flex lg:h-screen items-center py-24">
+            <div className="mx-auto max-w-3xl text-center">
+              <h1 className="bg-gradient-to-r dark:from-indigo-100 dark:to-indigo-500 from-indigo-400 to-indigo-700 bg-clip-text text-6xl font-extrabold text-transparent sm:text-7xl">
+                Aure Discord Bot
+              </h1>
+              <p className="w-3/4 sm:w-5/6 mx-auto mt-4 temy-20xt-black dark:text-white text-black">
+                Aure has access to millions of images, gifs, videos and audios of all categories for everyone, also with AI generation, for free.
+              </p>
+              <div className="mx-20 pt-8 sm:flex sm:flex-wrap sm:justify-center gap-4">
+                <div className="mb-4 sm:mb-0">
+                  <a
+                    className="rounded-md bg-indigo-500 px-6 py-3 text-base font-medium text-white transition hover:bg-indigo-500 dark:hover:bg-indigo-400 block w-full sm:inline-block"
+                    href="https://discord.com/oauth2/authorize?client_id=889540062956634164"
+                  >
+                    Add Aure
+                  </a>
+                </div>
+
+                <div>
+                  <a
+                    className="rounded-md bg-gray-300 px-6 py-3 text-base font-medium text-indigo-500 transition hover:text-indigo-800/75 dark:bg-gray-800 dark:text-white dark:hover:text-white/75 block w-full sm:inline-block"
+                    href="https://discord.gg/appnkdReFk"
+                  >
+                    Support Server
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="dark:text-white text-black" id="features">
+          <h2 className="text-5xl font-extrabold sm:text-5xl text-center">
+            What makes Aure <span className="bg-gradient-to-br from-blue-100 to-indigo-500 bg-clip-text text-transparent text-gradient-to-r dark:from-indigo-100 dark:to-indigo-500 font-extrabold">special</span>
+          </h2>
+          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center mx-auto max-w-3xl">
+            Aure has a huge database, with gifs, images, audios and videos in SFW and NSFW in hundreds of categories, an economy system for minigames and more.
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-8 md:mt-16 md:grid-cols-2 md:gap-12 lg:grid-cols-2">
+            {[
+              { icon: <Database size={20} />, title: "Unlimited NSFW Database", description: "With the NSFW command you can access thousands of individual images in more than 30 different categories." },
+              { icon: <Image size={20} />, title: "Unique AI Generation", description: "You can generate with artificial intelligence absolutely anything you can imagine, without censorship." },
+              { icon: <Heart size={20} />, title: "Like content, save it for later", description: "Like content and access it later by category." },
+              { icon: <Send size={20} />, title: "The widest webhook system", description: "Aure offers a customizable auto media posting system." }
+            ].map((feature, index) => (
+              <div key={index} className="flex items-start gap-4">
+                <span className="shrink-0 rounded-lg bg-gray-300 dark:bg-gray-800 p-4">
+                  {feature.icon}
+                </span>
+                <div>
+                  <h2 className="text-lg font-bold">{feature.title}</h2>
+                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="my-20" id="stats">
+          <div className="mx-auto max-w-screen-xl py-12">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2 className="text-5xl text-gray-900 dark:text-white sm:text-6xl font-extrabold">
+                Trusted by <span className="bg-gradient-to-br from-blue-100 to-indigo-500 bg-clip-text text-transparent text-gradient-to-r dark:from-indigo-100 dark:to-indigo-500 font-extrabold">@everyone</span>
+              </h2>
+              <p className="mt-4 text-gray-500 dark:text-gray-400">
+                The following statistics updates in real-time every five seconds:
+              </p>
+            </div>
+          </div>
+          <div className="mt-0">
+            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {[
+                { label: "Times Used", animatedValue: animatedTimesUsed, key: "timesUsed" },
+                { label: "Total Users", animatedValue: animatedTotalUsers, key: "totalUsers" },
+                { label: "Total Sent", animatedValue: animatedTotalSent, key: "totalSent" }
+              ].map(({ label, animatedValue, key }, index) => (
+                <div key={index} className="flex flex-col rounded-xl bg-indigo-200 px-4 py-8 text-center dark:bg-gray-800">
+                  <dt className="order-last text-lg font-medium text-gray-500 dark:text-white/75">{label}</dt>
+                  <dd className="text-4xl font-extrabold text-indigo-600 dark:text-white">
+                    <animated.span>
+                      {animatedValue.number.to((n) => formatNumber(Math.round(n)))}
+                    </animated.span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        <section className="dark:bg-gray-900 py-12 text-white" id="faq">
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-4xl font-extrabold">
+              Frequently Asked Questions
+            </h2>
+            <div className="mt-8 grid grid-cols-1 gap-6">
+              {faqs.map((faq, index) => (
+                <FAQItem key={index} question={faq.question} answer={faq.answer} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </Layout>
+  );
+}
