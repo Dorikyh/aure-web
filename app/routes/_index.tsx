@@ -5,27 +5,31 @@ import FAQItem from "../components/FAQ";
 import { useLoaderData } from "@remix-run/react";
 import Layout from '../components/Layout';
 
-// Loader para cargar los datos antes de que la página se renderice
 export function loader() {
-  return fetch("https://api.dorikyh.pw/bot/stats")
+  return fetch("https://us.mysrv.us/stats")
     .then(response => response.json())
     .then(data => ({
-      timesUsed: data.used_commands,
-      totalUsers: data.users,
-      totalSent: data.sent_media,
+      servers: data.bot.servers, // Número de servidores
+      webhooks: data.autopost.active, // Número de webhooks activos
+      todayCommands: data.commands.today, // Comandos usados hoy
     }))
     .catch(error => {
       console.error("Error fetching stats:", error);
-      return { timesUsed: 0, totalUsers: 0, totalSent: 0 };
+      return { 
+        servers: 0, 
+        webhooks: 0, 
+        todayCommands: 0
+      };
     });
 }
+
 
 export default function Home() {
   const stats = useLoaderData();  // Usamos los datos cargados por el loader
 
-  const animatedTimesUsed = useSpring({ number: stats.timesUsed, from: { number: 0 } });
-  const animatedTotalUsers = useSpring({ number: stats.totalUsers, from: { number: 0 } });
-  const animatedTotalSent = useSpring({ number: stats.totalSent, from: { number: 0 } });
+  const animatedServers = useSpring({ number: stats.servers, from: { number: 0 } });
+  const animatedWebhooks = useSpring({ number: stats.webhooks, from: { number: 0 } });
+  const animatedTodayCommands = useSpring({ number: stats.todayCommands, from: { number: 0 } });
 
   const formatNumber = (number) => {
     if (number >= 1000000) {
@@ -126,9 +130,9 @@ export default function Home() {
           <div className="mt-0">
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                { label: "Times Used", animatedValue: animatedTimesUsed, key: "timesUsed" },
-                { label: "Total Users", animatedValue: animatedTotalUsers, key: "totalUsers" },
-                { label: "Total Sent", animatedValue: animatedTotalSent, key: "totalSent" }
+                { label: "Times Used", animatedValue: animatedTodayCommands, key: "todayCommands" },
+                { label: "Total Servers", animatedValue: animatedServers, key: "servers" },
+                { label: "Webhooks", animatedValue: animatedWebhooks, key: "webhooks" }
               ].map(({ label, animatedValue, key }, index) => (
                 <div key={index} className="flex flex-col rounded-xl bg-indigo-200 px-4 py-8 text-center dark:bg-gray-800">
                   <dt className="order-last text-lg font-medium text-gray-500 dark:text-white/75">{label}</dt>
