@@ -1,37 +1,50 @@
 import { useSpring, animated } from '@react-spring/web';
 import { Heart, Database, Send, Image } from "react-feather";
-import SimpleSlider from "../components/SimpleSlider";
 import FAQItem from "../components/FAQ";
 import { useLoaderData } from "@remix-run/react";
-import Layout from '../components/Layout';
+import Layout from '../components/Layout';  
+import Ranking from '../components/Ranking';
+import SimpleSlider from '../components/SimpleSlider';
+import { json } from "@remix-run/node"; // Añadir importación de json
 
-export function loader() {
-  return fetch("https://us.mysrv.us/stats")
-    .then(response => response.json())
-    .then(data => ({
-      servers: data.bot.servers, // Número de servidores
-      webhooks: data.autopost.active, // Número de webhooks activos
-      todayCommands: data.commands.today, // Comandos usados hoy
-    }))
-    .catch(error => {
-      console.error("Error fetching stats:", error);
-      return { 
-        servers: 0, 
-        webhooks: 0, 
-        todayCommands: 0
-      };
+
+export const loader = async () => {
+  try {
+    const statsResponse = await fetch("https://us.mysrv.us/stats");
+    
+    if (!statsResponse.ok) throw new Error("Error en las respuestas");
+    
+    const statsData = await statsResponse.json();
+
+    return json({
+      stats: {
+        servers: statsData.bot.servers,
+        webhooks: statsData.autopost.active,
+        todayCommands: statsData.commands.today
+      }
     });
-}
-
+    
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return json({
+      stats: { 
+        servers: 0,
+        webhooks: 0,
+        todayCommands: 0
+      }
+    });
+  }
+};
 
 export default function Home() {
-  const stats = useLoaderData();  // Usamos los datos cargados por el loader
+  const { stats, ranking } = useLoaderData<typeof loader>();
 
   const animatedServers = useSpring({ number: stats.servers, from: { number: 0 } });
   const animatedWebhooks = useSpring({ number: stats.webhooks, from: { number: 0 } });
   const animatedTodayCommands = useSpring({ number: stats.todayCommands, from: { number: 0 } });
 
-  const formatNumber = (number) => {
+  const formatNumber = (number: number) => {
+    if (!number) return '0';
     if (number >= 1000000) {
       return (number / 1000000).toFixed(1) + 'M';
     }
@@ -144,6 +157,24 @@ export default function Home() {
                 </div>
               ))}
             </dl>
+          </div>
+        </section>
+
+        <section className="my-20" id="ranking">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="text-center mb-6 text-5xl text-gray-900 dark:text-white sm:text-5xl font-extrabold">
+              Top Users Ranking
+            </h2>
+            <Ranking ranking={ranking} />
+          </div>
+        </section>
+
+        <section className="my-20" id="serverss">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="text-center mb-6 text-5xl text-gray-900 dark:text-white sm:text-5xl font-extrabold">
+              Top Servers
+            </h2>
+            <SimpleSlider />
           </div>
         </section>
 
