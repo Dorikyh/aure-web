@@ -48,7 +48,7 @@ export default function Status() {
     <Layout>
           <div>
       <h1 className="text-6xl sm:text-7xl font-semibold text-center dark:text-white">
-        Realtime Status
+        Status
       </h1>
       <p className="text-center dark:text-white mb-12">
         Technical information about Aure in realtime.

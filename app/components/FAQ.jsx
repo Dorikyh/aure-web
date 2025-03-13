@@ -3,7 +3,7 @@ import React from 'react';
 
 const FAQItem = ({ question, answer }) => {
   return (
-    <details className="group rounded-lg bg-gray-50 p-6 dark:bg-gray-800 [&_summary::-webkit-details-marker]:hidden mb-2">
+    <details className="group rounded-xl bg-gray-50 p-6 dark:bg-gray-800 [&_summary::-webkit-details-marker]:hidden mb-2">
       <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
         <h2 className="text-2xl font-semibold dark:text-gray-200">{question}</h2>
         <span className="relative size-5 shrink-0">
