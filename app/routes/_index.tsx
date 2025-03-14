@@ -65,7 +65,7 @@ export default function Home() {
         {/* Imagen - Orden 1 en móvil */}
         <div className="flex justify-center md:justify-end order-1">
           <img 
-            src="/public/aure-512.png" 
+            src="/aure-512.png" 
             alt="Aure App" 
             className="w-64 h-64 md:w-80 md:h-80 rounded-5xl"
           />
