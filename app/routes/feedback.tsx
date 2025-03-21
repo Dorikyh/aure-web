@@ -10,6 +10,8 @@ export default function NotFound() {
         the page you're looking for doesn't exist :/
       </p>
     </div>
+    
+    
     </Layout>
   );
 }
