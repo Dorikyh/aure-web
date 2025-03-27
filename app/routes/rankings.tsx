@@ -10,44 +10,95 @@ type LoaderData = {
   currentPage: number;
   limit: number;
   advanced: boolean;
+  userTotal: number;
+  guildTotal: number;
+  sortBy: string;
 };
+
+// Definimos un límite para la petición a la API
+const API_LIMIT = 50;
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const page = Number(url.searchParams.get('page')) || 1;
-  const limit = Math.min(Number(url.searchParams.get('limit')) || 5, 20);
+  const displayLimit = Math.min(Number(url.searchParams.get('limit')) || 10, 10); // Límite de visualización a 10
   const advanced = url.searchParams.get('advanced') === 'true';
+  const sortBy = url.searchParams.get('sort') || 'votes';
 
-  // Fetch ranking de usuarios (por defecto usando "votes")
-  const userRes = await fetch(`https://us.mysrv.us/lb/votes?limit=${limit}${advanced ? `&page=${page}` : ''}`);
-  if (!userRes.ok) throw new Response("Error fetching user ranking", { status: userRes.status });
-  const userRanking = await userRes.json();
+  // Función para obtener datos y el total
+  const fetchData = async (endpoint: string, currentLimit: number, currentPage: number) => {
+    const res = await fetch(`${endpoint}?limit=${currentLimit}${advanced ? `&page=${currentPage}` : ''}`);
+    if (!res.ok) {
+      console.error(`Error fetching ${endpoint}:`, await res.text());
+      throw new Response(`Error fetching ${endpoint}`, { status: res.status });
+    }
+    const data = await res.json();
+    const totalRes = await fetch(endpoint.replace(/(\?.*)/, '/count'));
+    if (!totalRes.ok) {
+      console.error(`Error fetching count for ${endpoint}:`, await totalRes.text());
+      throw new Response(`Error fetching count for ${endpoint}`, { status: totalRes.status });
+    }
+    const totalData = await totalRes.json();
+    return { data, total: totalData.total };
+  };
 
-  // Fetch ranking de servidores (guilds)
-  const guildRes = await fetch(`https://us.mysrv.us/popular_servers?limit=${limit}${advanced ? `&page=${page}` : ''}`);
-  if (!guildRes.ok) throw new Response("Error fetching guild ranking", { status: guildRes.status });
-  const guildRanking = await guildRes.json();
+  // Fetch ranking de usuarios con el límite de la API
+  try {
+    const userResult = await fetchData(`https://us.mysrv.us/lb/${sortBy}`, API_LIMIT, page);
+    const userRanking = userResult.data || [];
+    const userTotal = userResult.total;
 
-  return json<LoaderData>({ userRanking, guildRanking, currentPage: page, limit, advanced });
+    // Fetch ranking de servidores
+    const guildResult = await fetchData(`https://us.mysrv.us/popular_servers`, API_LIMIT, page);
+    const guildRanking = guildResult.data || [];
+    const guildTotal = guildResult.total;
+
+    return json<LoaderData>({
+      userRanking,
+      guildRanking,
+      currentPage: page,
+      limit: displayLimit, // Usar el límite de visualización
+      advanced,
+      userTotal,
+      guildTotal,
+      sortBy,
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return json<LoaderData>({
+      userRanking: [],
+      guildRanking: [],
+      currentPage: page,
+      limit: displayLimit, // Usar el límite de visualización
+      advanced,
+      userTotal: 0,
+      guildTotal: 0,
+      sortBy,
+    });
+  }
 };
 
 export default function RankingsPage() {
-  const { userRanking, guildRanking, currentPage, limit, advanced } = useLoaderData<LoaderData>();
+  const { userRanking, guildRanking, currentPage, limit, advanced, userTotal, guildTotal, sortBy } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handlePrevious = () => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
-      navigate(`?page=${newPage}&limit=${limit}&advanced=${advanced}`);
+      navigate(`?page=${newPage}&limit=${limit}&advanced=${advanced}&sort=${sortBy}`);
     }
   };
 
   const handleNext = () => {
-    // Se asume que si se recibe una página completa, hay siguiente
-    if (userRanking.length === limit && guildRanking.length === limit) {
-      const newPage = currentPage + 1;
-      navigate(`?page=${newPage}&limit=${limit}&advanced=${advanced}`);
-    }
+    const newPage = currentPage + 1;
+    navigate(`?page=${newPage}&limit=${limit}&advanced=${advanced}&sort=${sortBy}`);
+  };
+
+  const handleSortChange = (newSort: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('sort', newSort);
+    navigate(`?${params.toString()}`);
   };
 
   return (
@@ -56,23 +107,27 @@ export default function RankingsPage() {
         <h1 className="text-5xl font-extrabold mb-8 text-center">Rankings</h1>
         {/* Ranking de Usuarios */}
         <Ranking
-          ranking={userRanking}
+          ranking={userRanking.slice(0, limit)} // Mostrar solo el límite de visualización
           type="users"
-          limit={10}
+          limit={20} // Pasamos el limite de visualizacion
+          currentPage={currentPage}
+          advanced={true}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          total={20}
+          sortBy={sortBy}
+          onSortChange={handleSortChange}
+        />
+        {/* Ranking de Servidores */}
+        <Ranking
+          ranking={guildRanking.slice(0, limit)}  // Mostrar solo el límite de visualización
+          type="guilds"
+          limit={limit}
           currentPage={currentPage}
           advanced={false}
           onPrevious={handlePrevious}
           onNext={handleNext}
-        />
-        {/* Ranking de Servidores */}
-        <Ranking
-          ranking={guildRanking}
-          type="guilds"
-          limit={limit}
-          currentPage={currentPage}
-          advanced={advanced}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
+          total={guildTotal}
         />
       </div>
     </Layout>

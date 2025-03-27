@@ -19,13 +19,13 @@ function NavBar() {
         </a>
         
 <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-  <button 
+  <a href="https://discord.com/oauth2/authorize?client_id=889540062956634164" 
     type="button" 
-    className="text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-md text-sm px-3 py-2 text-center font-semibold dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 flex items-center"
+    className="text-white bg-indigo-500 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-3 py-2 text-center font-semibold dark:bg-indigo-500 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 flex items-center"
   >
     <UserPlus width={18} height={18} className="mr-1" />
-    Add Aure
-  </button>
+    Add
+  </a>
           <button 
             onClick={() => setIsOpen(!isOpen)}
             type="button" 
@@ -54,7 +54,7 @@ function NavBar() {
             <li className="w-full md:w-auto">
               <a 
                 href="#" 
-                className="block py-2 px-3 text-white bg-indigo-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-indigo-500" 
+                className="block py-2 px-3 text-white bg-indigo-700 rounded-lg md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-indigo-500" 
                 aria-current="page"
                 onClick={() => setIsOpen(false)}
               >
@@ -64,7 +64,7 @@ function NavBar() {
             <li className="w-full md:w-auto">
               <a 
                 href="/status" 
-                className="block py-2 px-3 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                className="block py-2 px-3 mt-1 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 rounded-lg dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                 onClick={() => setIsOpen(false)}
               >
                 Status
@@ -73,7 +73,7 @@ function NavBar() {
             <li className="w-full md:w-auto">
               <a 
                 href="/stats" 
-                className="block py-2 px-3 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                className="block py-2 px-3 rounded-lg mt-1 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                 onClick={() => setIsOpen(false)}
               >
                 Stats
@@ -82,7 +82,7 @@ function NavBar() {
             <li className="w-full md:w-auto">
               <a 
                 href="/support" 
-                className="block py-2 px-3 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                className="block py-2 px-3 mt-1 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 rounded-lg dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                 onClick={() => setIsOpen(false)}
               >
                 Support

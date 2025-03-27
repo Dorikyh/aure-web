@@ -29,8 +29,8 @@ export const loader: LoaderFunction = async () => {
     return json({
       stats: {
         servers: statsData.bot.servers,
-        webhooks: statsData.autopost.active,
-        todayCommands: statsData.commands.today,
+        sent: statsData.autopost.total_sent,
+        users: statsData.bot.users,
       },
       ranking: rankingData,
       servers: serversData,
@@ -38,10 +38,10 @@ export const loader: LoaderFunction = async () => {
   } catch (error) {
     console.error("Error fetching data:", error);
     return json({
-      stats: { 
+      stats: {
         servers: 0,
-        webhooks: 0,
-        todayCommands: 0,
+        sent: 0,
+        users: 0,
       },
       ranking: [],
       servers: [],
@@ -53,8 +53,8 @@ export default function Home() {
   const { stats, ranking, servers } = useLoaderData<typeof loader>();
 
   const animatedServers = useSpring({ number: stats.servers, from: { number: 0 } });
-  const animatedWebhooks = useSpring({ number: stats.webhooks, from: { number: 0 } });
-  const animatedTodayCommands = useSpring({ number: stats.todayCommands, from: { number: 0 } });
+  const animatedSent = useSpring({ number: stats.sent, from: { number: 0 } });
+  const animatedUsers = useSpring({ number: stats.users, from: { number: 0 } });
   
   
   
@@ -172,8 +172,8 @@ export default function Home() {
             {[
               { icon: <Database size={20} />, title: "Unlimited NSFW Database", description: "With the NSFW command you can access thousands of individual images in more than 30 different categories." },
               { icon: <Image size={20} />, title: "Unique AI Generation", description: "You can generate with artificial intelligence absolutely anything you can imagine, without censorship." },
-              { icon: <Heart size={20} />, title: "Like content, save it for later", description: "Like content and access it later by category." },
-              { icon: <Send size={20} />, title: "The widest webhook system", description: "Aure offers a customizable auto media posting system." }
+              { icon: <Heart size={20} />, title: "Like content, save it for later", description: "Like content and access it later by category. Or even, download it!" },
+              { icon: <Send size={20} />, title: "The widest webhook system", description: "An efficient system that sends millions of different images, videos and gifs among thousands of servers." }
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4">
                 <span className="shrink-0 rounded-lg bg-gray-300 dark:bg-gray-800 p-4">
@@ -202,9 +202,9 @@ export default function Home() {
           <div className="mt-0">
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                { label: "Times Used", animatedValue: animatedTodayCommands, key: "todayCommands" },
-                { label: "Total Servers", animatedValue: animatedServers, key: "servers" },
-                { label: "Webhooks", animatedValue: animatedWebhooks, key: "webhooks" }
+                { label: "Users", animatedValue: animatedUsers, key: "users" },
+                { label: "Servers", animatedValue: animatedServers, key: "servers" },
+                { label: "Total Sent", animatedValue: animatedSent, key: "sent" }
               ].map(({ label, animatedValue }, index) => (
                 <div key={index} className="flex flex-col rounded-xl bg-indigo-200 px-4 py-8 text-center dark:bg-gray-800">
                   <dt className="order-last text-lg font-medium text-gray-500 dark:text-white/75">{label}</dt>
@@ -221,7 +221,7 @@ export default function Home() {
 
         <section className="my-20" id="ranking">
           <div className="mx-auto max-w-7xl px-4">
-            <Ranking ranking={ranking} type="users" limit={5} advanced={false} />
+            <Ranking ranking={ranking} type="users" total={7} advanced={false} />
           </div>
         </section>
 
