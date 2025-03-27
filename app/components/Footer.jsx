@@ -1,11 +1,9 @@
-import React from 'react';
-
 const Footer = () => {
     return (
         <footer className="bg-white shadow dark:bg-gray-800">
             <div className="w-full max-w-screen-xl mx-auto md:py-8 p-8">
                 <div className="flex flex-col items-center sm:flex-row sm:justify-between">
-                    <a href="https://aure.tech/" className="flex items-center space-x-2 sm:mb-0 mb-6">
+                    <a href="/" className="flex items-center space-x-2 sm:mb-0 mb-6">
                         <img src="/aure.png" className="h-8" alt="Aure Logo" />
                         <span className="text-2xl font-semibold whitespace-nowrap dark:text-white">Aure</span>
                     </a>

@@ -8,6 +8,7 @@ import Layout from '~/components/Layout';
 import Ranking from '~/components/Ranking';
 import SimpleSlider, { Server } from '~/components/SimpleSlider';
 import RotatingText from "~/components/RotatingText";
+import DiscordMessage from "~/components/DiscordMessage";
 
 export const loader: LoaderFunction = async () => {
   try {
@@ -221,7 +222,7 @@ export default function Home() {
 
         <section className="my-20" id="ranking">
           <div className="mx-auto max-w-7xl px-4">
-            <Ranking ranking={ranking} type="users" total={7} advanced={false} />
+            <Ranking ranking={ranking} type="users" limit={7} total={7} advanced={false} />
           </div>
         </section>
 
@@ -233,6 +234,7 @@ export default function Home() {
             <SimpleSlider servers={servers} />
           </div>
         </section>
+
 
         <section className="dark:bg-gray-900 py-12 text-white" id="faq">
           <div className="max-w-7xl mx-auto">
